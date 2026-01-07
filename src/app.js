@@ -1,31 +1,23 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
-
-dotenv.config();
+import reviewRoutes from "./routes/reviewRoutes.js";
+import connectDB from "./config/db.js";
 
 const app = express();
 
+// middlewares
 app.use(cors());
 app.use(express.json());
 
-// 🔹 MongoDB connect (Vercel-safe)
-if (!mongoose.connection.readyState) {
-  mongoose
-    .connect(process.env.MONGO_URI)
-    .then(() => console.log("MongoDB Connected ✅"))
-    .catch((err) => console.error("Mongo error ❌", err.message));
-}
+// DB connection (safe for both)
+connectDB();
 
-// 🔹 Test route
+// routes
+app.use("/api/reviews", reviewRoutes);
+
+// health check
 app.get("/", (req, res) => {
-  res.json({ status: "Backend running on Vercel 🚀" });
+  res.status(200).json({ status: "API running successfully 🚀" });
 });
 
-// 🔹 Example API
-app.get("/api/health", (req, res) => {
-  res.json({ ok: true });
-});
-
-export default app; // ✅ VERY IMPORTANT
+export default app;
